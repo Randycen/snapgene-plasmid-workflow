@@ -1,6 +1,6 @@
 ---
 name: snapgene-plasmid-builder
-version: 1.3.0
+version: 1.4.0
 description: Simulate SnapGene plasmid construction from native .dna templates while preserving topology, features, primer display, primer provenance, and traceable construction records.
 ---
 
@@ -245,28 +245,76 @@ Before delivery verify:
 
 When the user asks for `构建清单` or `实验清单`, output an ultra-compact TXT-style record using current UTC+8 time to the minute.
 
-Format:
+### 14.1 Deduplicate physical PCR fragments before assigning F numbers
+
+Before writing the checklist, compare **all PCR fragments across all target plasmids in the same task**.
+
+Treat two PCR fragments as the **same reusable physical fragment** when they have the same:
+
+- template
+- primer pair
+- expected PCR product sequence/length
+
+A reusable fragment must be listed **once only** and assigned **one F number only**. Later plasmid assemblies must reference that same F number instead of creating a duplicate F entry.
+
+`F1/F2/F3...` therefore represent **unique PCR products that need to be physically prepared**, not fragment slots inside each plasmid design.
+
+If the same backbone PCR is used for several Gibson assemblies, mark it clearly as shared, for example:
+
+```text
+T = pJC2641
+P = JC2330F/JC2330R
+F1 = 12776（共用，做1次）
+```
+
+Then reuse it:
+
+```text
+pJC2642/Gibson = f1+f2
+pJC2643/Gibson = f1+f3
+```
+
+Do not instruct the user to repeat the same PCR merely because the fragment appears in more than one target plasmid. If more DNA quantity may be required, state that separately rather than silently duplicating the PCR in the checklist.
+
+### 14.2 Checklist format
+
+Example:
 
 ```text
 时间：YYYY-MM-DD HH:MM
 
-构建 pXXXX（目标：...）
+共用PCR片段
 
-T = template
-P = primerF/primerR
-F1 = length
+T = pJC2641
+P = JC2330F/JC2330R
+F1 = 12776（共用，做1次）
 
-T = template
+
+构建 pJC2642（目标：...）
+
+T = insert_template_A
 P = primerF/primerR
 F2 = length
 
-pXXXX/Gibson = f1+f2
+pJC2642/Gibson = f1+f2
+DH5a，LB，“___”，30℃
+
+
+构建 pJC2643（目标：...）
+
+T = insert_template_B
+P = primerF/primerR
+F3 = length
+
+pJC2643/Gibson = f1+f3
 DH5a，LB，“___”，30℃
 ```
 
 Rules:
 
-- F numbering is continuous across all plasmids in the same checklist
+- deduplicate identical PCR products across the entire checklist **before** numbering
+- F numbering is continuous across **unique physical PCR products** only
+- a shared F can be referenced by any number of downstream assemblies
 - Golden Gate uses `pXXXX/GoldenGate = ...`
 - unknown culture conditions use `“___”`; do not invent them
 - keep the checklist directly copyable and report-like prose out of it

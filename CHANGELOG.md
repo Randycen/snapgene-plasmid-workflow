@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.2 — 2026-09-07
+
+- Primer reuse now requires QC; an existing JC primer is not automatically preferred if its annealing Tm or thermodynamic behavior is poor.
+- Added user-locked primer exception policy: explicitly locked primers are retained unchanged but QC warnings are still reported.
+- PCR template-annealing regions now target 58–60 °C as the normal acceptance range.
+- Gibson overlap length is selected by a 50–55 °C overlap-Tm target rather than a fixed base-pair length.
+- Added mandatory Primer3/ntthal thermodynamic QC for new primers and new primer pairs (hairpin, self-dimer, heterodimer, and 3′ complementarity).
+- Full synthesized oligos, including 5′ Gibson/Golden Gate additions, are used for secondary-structure QC; annealing Tm is calculated only from the template-binding 3′ region.
+- If Primer3 cannot actually be executed, output must say `Primer3 QC: NOT VERIFIED`; the workflow must not imply a pass.
+
 ## v1.1 — 2026-09-07
 
 - Final assembled SnapGene plasmids now display a primer as a continuous full-length match whenever the entire primer sequence exists continuously in the final product.

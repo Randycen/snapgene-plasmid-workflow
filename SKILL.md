@@ -1,6 +1,6 @@
 ---
 name: snapgene-plasmid-builder
-version: 1.0.0
+version: 1.1.0
 description: Rebuild and simulate SnapGene plasmid cloning from .dna templates using a user-supplied primer table as the authoritative primer source, while preserving topology, feature styles, primer display metadata, and construction traceability.
 ---
 
@@ -219,26 +219,48 @@ If new primers are unavoidable:
 
 Do not silently overwrite the user's original primer table. Return a new updated copy.
 
+## 5.5 Primer Tm design preferences
+
+For **newly designed primers**, use the following soft targets unless the user specifies otherwise:
+
+- **PCR template-annealing region Tm:** preferentially **58–60 °C**, ideally near the middle of that range.
+- **Gibson homology/overlap Tm:** preferentially **50–55 °C**. Choose the overlap **length** needed to reach this Tm rather than using a fixed number of base pairs.
+
+These are design preferences, not absolute rejection criteria. An existing primer from the authoritative primer table should generally be reused when it is otherwise suitable, even if its Tm is modestly outside the preferred range.
+
+Use a consistent Tm calculation method within the same construction task. Distinguish clearly between the Tm of the **3′ template-annealing region** and the Tm of the **5′ Gibson overlap**.
+
 ---
 
 # 6. Gibson / Golden Gate Primer Display in SnapGene
 
-Primer display must reflect the real molecular design.
+Primer display must reflect **which molecule is being viewed**.
 
-For Gibson primers:
+## 6.1 PCR template or PCR-intermediate display
 
-- the **5′ homology/overlap tail** is a non-hybridizing primer component
+When a primer is displayed on the **original PCR template** or an unassembled PCR intermediate:
+
+- the **5′ Gibson homology/overlap tail** is a non-hybridizing primer component
 - the **3′ template-specific region** is the annealing/binding region
-- do not mark the entire primer as annealing to the template
+- do not mark a non-template 5′ tail as annealing to the original PCR template
 - preserve primer direction
-- store or calculate a sensible annealing Tm for the 3′ binding region
+- store or calculate the annealing Tm from the 3′ template-specific region
 
-For Golden Gate primers:
+For Golden Gate primers on the original PCR template, likewise distinguish non-template 5′ additions (protective bases, Type IIS site, designed overhang) from the 3′ annealing region.
 
-- distinguish non-template 5′ additions (protective bases, Type IIS site, designed overhang) from the 3′ annealing region
-- ensure the designed overhang/orientation recreates the intended final junction
+## 6.2 Final assembled-plasmid display
 
-The final `.dna` should show primers in a way that is visually consistent with native SnapGene primers rather than a generic feature annotation.
+For a **final assembled plasmid `.dna` file**, use a different display rule:
+
+- if the **entire primer sequence is present continuously in the final assembled plasmid**, map/display the **full primer sequence as one continuous match**
+- do **not** force the former Gibson/Golden Gate 5′ tail to remain visually folded out merely because it was non-hybridizing on the original PCR template
+- this avoids making a correctly assembled junction look as though part of the primer is mismatched
+- retain the original molecular meaning in **Description**, including the original 3′ annealing region and the 5′ Gibson overlap/Golden Gate addition
+- if the full primer sequence is **not** present continuously in the final plasmid, keep the truly non-hybridizing 5′ component displayed separately
+
+Thus, primer display on the final product is a **final-sequence mapping view**, while Description preserves the **construction-history view**.
+
+The final `.dna` should remain visually consistent with native SnapGene primer behavior and should not use generic feature annotations as a substitute for primer objects.
 
 ---
 
@@ -298,7 +320,7 @@ For each target plasmid:
 13. preserve the parent SnapGene display/topology metadata
 14. validate the final sequence independently
 
-For Gibson, verify overlap identity at every junction.
+For Gibson, verify overlap identity at every junction. For newly designed overlaps, preferentially choose an overlap length that gives an overlap Tm of **50–55 °C**.
 
 For Golden Gate, verify Type IIS cleavage logic, overhang sequence, orientation, and absence/presence of unwanted internal sites where relevant.
 
@@ -322,7 +344,7 @@ Do not deliver a final `.dna` until all applicable checks pass.
 - features are visible
 - feature colors are sensible and inherited from sources
 - primers are visible
-- Gibson/Golden Gate primer tails are displayed as non-hybridizing additions
+- on final assembled plasmids, any primer whose full sequence exists continuously in the product is displayed as a continuous full-length match; truly absent 5′ additions remain non-hybridizing
 - primer directions are correct
 - Description contains the manual construction history
 

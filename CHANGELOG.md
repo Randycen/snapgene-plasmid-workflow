@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.1 — 2026-09-07
+
+- Final assembled SnapGene plasmids now display a primer as a continuous full-length match whenever the entire primer sequence exists continuously in the final product.
+- Gibson/Golden Gate 5′ additions remain folded/non-hybridizing only on the original PCR template or when that sequence is truly absent from the final product.
+- Construction Description retains the original 3′ annealing region and 5′ overlap/addition semantics.
+- Newly designed PCR template-annealing regions preferentially target 58–60 °C.
+- Newly designed Gibson overlaps preferentially target 50–55 °C; overlap length is chosen to reach the target Tm rather than by a fixed bp length.
+- Existing suitable primers from the authoritative primer table still take priority over redesign solely to meet the preferred Tm range.
+
 ## v1.0 — 2026-09-07
 
 Initial plasmid construction workflow.

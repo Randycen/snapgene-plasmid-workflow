@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.3 — 2026-09-07
+
+- Historical primer reuse is now provenance-aware: user-locked > established laboratory primer > legacy template primer > newly designed primer.
+- The 58–60 °C annealing target is explicitly a design target for **new primers**, not an automatic rejection threshold for established primers.
+- Existing primers such as a validated backbone PCR pair should not be replaced merely to move Tm closer to 59 °C.
+- Native SnapGene BindingSite and meltingTemperature metadata are treated as evidence of intended historical use and should be preserved when possible.
+- Existing primers are replaced only for a material reason (wrong template/orientation/junction, important 3′ mismatch, known failure, severe structure/pair incompatibility, or explicit user request).
+- Template-only legacy primers can be reused and normalized to a formal JC name, with the old name retained as an alias in Description.
+
 ## v1.2 — 2026-09-07
 
 - Primer reuse now requires QC; an existing JC primer is not automatically preferred if its annealing Tm or thermodynamic behavior is poor.

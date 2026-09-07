@@ -1,0 +1,13 @@
+Primer_Name,seq,lenth,Description
+EX0001F,GACAGGCTGGTTGTGGTGAT,20,Example PCR forward primer
+EX0001R,AACTTCACAATGCTATGGAG,20,Example PCR reverse primer
+EX0002F,CAACACTTAATCACTGTAATTG,22,Example insert amplification forward primer
+EX0002R,TACTTCGTCGGAGCTACTGGCT,22,Example insert amplification reverse primer
+EX0003F,CCTCTTGAGTTGAATTATGTGGTCAACTTAGGATGATCTA,40,Example Gibson primer: 5' overlap + 3' annealing region
+EX0003R,TCATTCTATGGCTAGGTGTGACTATGCCGAGCCATTGTACC,41,Example Gibson primer: 5' overlap + 3' annealing region
+EX0004F,AGAATCAATGAACTTCAGGCTCCATGACGTCG,32,Example Golden Gate primer with Type IIS site and overhang
+EX0004R,CGCGTTCACAGGTTGGTTCGCCGCTGGCGATT,32,Example Golden Gate primer with Type IIS site and overhang
+EX0005F,ATCTGTTCTTAGACGGACTCA,21,Example colony-PCR junction forward primer
+EX0005R,GAGCCAGTCAGTGCCAAGCAC,21,Example colony-PCR junction reverse primer
+EX0006F,GCGCTCCAGCGGATAATTA,19,Example sequencing/validation forward primer
+EX0006R,CAAGTCAATGTTGATGGTC,19,Example sequencing/validation reverse primer

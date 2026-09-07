@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.4 — 2026-09-07
+
+- Construction checklists now deduplicate identical PCR products across all target plasmids before assigning F numbers.
+- `F1/F2/F3...` now represent unique physical PCR fragments that need to be prepared, not per-plasmid fragment slots.
+- Shared backbone PCR products are listed once and explicitly marked as reusable/shared (for example `F1 = 12776（共用，做1次）`).
+- Multiple Gibson/Golden Gate assemblies must reference the same shared F number instead of duplicating the same PCR as a new F entry.
+- If additional DNA quantity may be needed, state that separately rather than silently duplicating the PCR experiment in the checklist.
+
 ## v1.3 — 2026-09-07
 
 - Historical primer reuse is now provenance-aware: user-locked > established laboratory primer > legacy template primer > newly designed primer.

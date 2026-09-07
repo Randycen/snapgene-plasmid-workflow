@@ -1,6 +1,6 @@
 ---
 name: snapgene-plasmid-builder
-version: 1.1.0
+version: 1.2.0
 description: Rebuild and simulate SnapGene plasmid cloning from .dna templates using a user-supplied primer table as the authoritative primer source, while preserving topology, feature styles, primer display metadata, and construction traceability.
 ---
 
@@ -178,14 +178,20 @@ For matching:
 
 ## 5.2 Primer reuse priority
 
+Existing primers are preferred **only after they pass the same suitability checks required for new primers**. Reuse must never override basic primer quality.
+
 When a primer is needed, use this order:
 
-1. exact sequence match in the current primer table
-2. existing primer in the table that already binds the correct Gibson/Golden Gate interface and has suitable orientation
-3. existing primer in the table that produces an appropriate validation amplicon
+1. exact sequence match in the current primer table **that passes Tm/secondary-structure/pairing checks**
+2. existing primer in the table near the correct Gibson/Golden Gate interface with suitable orientation **and acceptable QC**
+3. existing validation primer that yields an appropriate diagnostic amplicon **and acceptable QC**
 4. only then design a new primer
 
-Never create a duplicate new primer if an identical sequence is already present in the current primer table.
+Never create a duplicate new primer if an identical sequence is already present and acceptable.
+
+### User-locked primer exception
+
+If the user explicitly instructs that a named existing primer must be retained (for example `JC2522F`), treat it as **locked**: do not redesign or rename it. Still report its calculated properties and any QC warnings. A locked primer exception applies only to that primer and does not relax QC for the rest of the construction.
 
 ## 5.3 Legacy SnapGene primer names
 
@@ -219,16 +225,30 @@ If new primers are unavoidable:
 
 Do not silently overwrite the user's original primer table. Return a new updated copy.
 
-## 5.5 Primer Tm design preferences
+## 5.5 Primer Tm design requirements
 
-For **newly designed primers**, use the following soft targets unless the user specifies otherwise:
+Unless the user explicitly approves an exception:
 
-- **PCR template-annealing region Tm:** preferentially **58–60 °C**, ideally near the middle of that range.
-- **Gibson homology/overlap Tm:** preferentially **50–55 °C**. Choose the overlap **length** needed to reach this Tm rather than using a fixed number of base pairs.
+- **PCR template-annealing region Tm:** target **58–60 °C**. New primers should normally fall inside this range; redesign the annealing length before accepting an out-of-range primer.
+- **Gibson homology/overlap Tm:** target **50–55 °C**. Choose overlap **length from Tm**, not from a fixed 20/25-bp rule.
+- Calculate and report the annealing-region Tm and Gibson-overlap Tm separately.
+- Use one consistent nearest-neighbor/Primer3-compatible Tm method within a construction task.
 
-These are design preferences, not absolute rejection criteria. An existing primer from the authoritative primer table should generally be reused when it is otherwise suitable, even if its Tm is modestly outside the preferred range.
+Existing primers may be reused outside these preferred windows only when there is a concrete experimental reason, or when the user explicitly locks that primer. Do not preserve an existing primer merely because it already has a JC number.
 
-Use a consistent Tm calculation method within the same construction task. Distinguish clearly between the Tm of the **3′ template-annealing region** and the Tm of the **5′ Gibson overlap**.
+## 5.6 Mandatory Primer3 thermodynamic QC
+
+Before final delivery, run Primer3/ntthal-compatible thermodynamic checks for every **new primer** and every **PCR primer pair** used in the construction, including reused primers paired in a new combination. Check at minimum:
+
+- hairpin
+- self-dimer / self complementarity
+- 3′ self complementarity
+- pair heterodimer / pair complementarity
+- 3′ pair complementarity
+
+For Gibson/Golden Gate primers, secondary-structure QC must evaluate the **full synthesized oligo including the 5′ addition**, while primer Tm is reported for the 3′ template-annealing region separately.
+
+If actual Primer3/ntthal cannot be executed in the current environment, mark the result **`Primer3 QC: NOT VERIFIED`** and do not claim that the primer passed. Do not substitute an informal visual check and call it Primer3 QC.
 
 ---
 
@@ -353,6 +373,10 @@ Do not deliver a final `.dna` until all applicable checks pass.
 - all official primer names are consistent with the latest primer table
 - no duplicate sequence was unnecessarily given a new primer ID
 - new primers are included in the updated primer table
+- new annealing regions normally meet the **58–60 °C** target unless explicitly exempted
+- new Gibson overlaps normally meet the **50–55 °C** target unless explicitly exempted
+- Primer3/ntthal thermodynamic QC status is explicitly reported
+- every new primer and every new primer pair is checked for hairpin/self-dimer/heterodimer and 3′ complementarity when Primer3 is available
 - colony-PCR amplicon size is reported and is diagnostic
 
 ---
